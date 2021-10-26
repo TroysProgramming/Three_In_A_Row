@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Three_In_A_Row</string>
+    <string name="start">Start</string>
+    <string name="settings">Settings</string>
+    <string name="highscore">High Scores</string>
+    <string name="restart">Restart Game</string>
+    <string name="timespent">Time Spent:</string>
+    <string name="colour1">Colour 1:</string>
+    <string name="colour2">Colour 2:</string>
+    <string name="gridsize">Grid Size:</string>
+
+    <!-- TODO: Drop down menu, follow: https://www.geeksforgeeks.org/exposed-drop-down-menu-in-android/ -->
+
+    <string-array name="grid_sizes">
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
 </resources>
