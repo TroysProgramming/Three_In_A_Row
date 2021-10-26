@@ -1,29 +1,31 @@
 package com.troysprogramming.three_in_a_row.controllers
 
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.View
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
+import android.widget.Toast.LENGTH_SHORT
+import com.troysprogramming.three_in_a_row.R
 import com.troysprogramming.three_in_a_row.models.Game
 import com.troysprogramming.three_in_a_row.models.GridItem
 import com.troysprogramming.three_in_a_row.views.GameActivity
 
-class GameController
+class GameController(activity: GameActivity)
 {
+    private var gameActivity: GameActivity = activity
+
     fun generateGrid(gameView: GameActivity) {
         // TODO: get grid size from shared preferences
-        val gridSizeX: Int = 5
-        val gridSizeY: Int = 5
+        val gridSize: Int = 4
 
         // create a new game object and initialise the 2D grid of GridItems
-        Game.startNewGame(gridSizeX, gridSizeY)
+        Game.startNewGame(gridSize)
 
         // pass grid size to view to display the grid
-        gameView.renderGrid(gridSizeX, gridSizeY)
+        gameView.renderGrid(gridSize)
     }
 
-    fun onGridItemClick(v: View, x: Int, y: Int) {
+    fun onGridItemClick(clickedView: View, x: Int, y: Int, currentTurnView: View) {
         // notify the Game instance that a grid item in the passed co-ordinates has been touched
         val isValidMove : Boolean = Game.getGame().checkValidMove(x, y)
 
@@ -37,15 +39,42 @@ class GameController
             val occupation : GridItem.Companion.Occupation = Game.getGame().getOccupation(x, y)
 
             // set the tapped view to their colour
-            v.setBackgroundColor(
+            clickedView.setBackgroundColor(
                 if(occupation == GridItem.Companion.Occupation.PLAYER1)
                     Color.RED
                 else
                     Color.BLUE
             )
 
+            // check for three in a row
+            var isGameOver : Boolean = Game.getGame().checkForThree(x, y)
+
             // swap turns
             Game.getGame().swapTurns()
+
+            // if the game is over, show the winner
+            if(isGameOver)
+            {
+                val winner : String = if(Game.getGame().checkIfPlayerOnesTurn())
+                    gameActivity.baseContext.resources.getString(R.string.p1win)
+                else
+                    gameActivity.baseContext.resources.getString(R.string.p2win)
+
+                with(gameActivity) {
+                    displayMessage(winner, true)
+                    lockGameControls()
+                    stopTheTimer()
+                }
+            }
+
+            // change the colour of the view showing the current player's turn
+            showCurrentTurn(currentTurnView)
+        }
+        else
+        {
+            // if the move is not valid, present an error to the user.
+            gameActivity.displayMessage(gameActivity.baseContext.resources
+                .getString(R.string.invalidmove), false)
         }
     }
 
@@ -60,5 +89,15 @@ class GameController
         }
 
         return arrayOf(-1, -1)
+    }
+
+    fun showCurrentTurn(colourView: View)
+    {
+        colourView.setBackgroundColor(
+            if(Game.getGame().checkIfPlayerOnesTurn())
+                Color.RED
+            else
+                Color.BLUE
+        )
     }
 }

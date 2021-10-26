@@ -5,6 +5,10 @@
     <string name="highscore">High Scores</string>
     <string name="restart">Restart Game</string>
     <string name="timespent">Time Spent:</string>
+    <string name="currentturn">Current Turn:</string>
+    <string name="invalidmove">Invalid move.</string>
+    <string name="p1win">Player 1 Wins!</string>
+    <string name="p2win">Player 2 Wins!</string>
     <string name="colour1">Colour 1:</string>
     <string name="colour2">Colour 2:</string>
     <string name="gridsize">Grid Size:</string>
@@ -15,5 +19,6 @@
         <item>3x3</item>
         <item>4x4</item>
         <item>5x5</item>
+        <item>6x6</item>
     </string-array>
 </resources>
