@@ -24,5 +24,8 @@ class WelcomeActivity : AppCompatActivity() {
         btnStart.setOnClickListener {
             startActivity(Intent(this, GameActivity::class.java))
         }
+        btnSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
     }
 }

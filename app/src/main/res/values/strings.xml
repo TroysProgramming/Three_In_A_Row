@@ -12,13 +12,14 @@
     <string name="colour1">Colour 1:</string>
     <string name="colour2">Colour 2:</string>
     <string name="gridsize">Grid Size:</string>
+    <string name="savesettings">Save Settings</string>
+    <string name="resetdefault">Reset To Default</string>
 
     <!-- TODO: Drop down menu, follow: https://www.geeksforgeeks.org/exposed-drop-down-menu-in-android/ -->
 
     <string-array name="grid_sizes">
-        <item>3x3</item>
-        <item>4x4</item>
-        <item>5x5</item>
-        <item>6x6</item>
+        <item>4 x 4</item>
+        <item>5 x 5</item>
+        <item>6 x 6</item>
     </string-array>
 </resources>

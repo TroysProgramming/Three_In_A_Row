@@ -24,8 +24,8 @@ class GameActivity : AppCompatActivity() {
     private lateinit var txtTimerSeconds : TextView
     private lateinit var txtTimerMinutes : TextView
     private lateinit var btnRestart : Button
-    private var seconds = 0
-    private var minutes = 0
+    private var seconds : Int = 0
+    private var minutes : Int = 0
     private lateinit var timer : CountDownTimer
 
     override fun onCreate(sis: Bundle?) {
@@ -43,7 +43,9 @@ class GameActivity : AppCompatActivity() {
         btnRestart = findViewById(R.id.btn_restart)
         btnRestart.setOnClickListener { recreate() }
 
-        controller.generateGrid(this)
+        controller.setPlayerColours()
+
+        controller.generateGrid()
 
         fireUpTheTimer()
 
@@ -92,9 +94,11 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    fun displayMessage(message: String, permanent: Boolean) {
+    fun displayMessage(message: String, color: Int, permanent: Boolean) {
 
         txtMessage.text = message
+
+        txtMessage.setTextColor(color)
 
         if(!permanent) {
             Timer().schedule(object: TimerTask() {
