@@ -1,6 +1,6 @@
-package com.troysprogramming.three_in_a_row.models
+package com.troysprogramming.three_in_a_row.models.game
 
-class Game(gridSize: Int) {
+class Game private constructor(gridSize: Int) {
 
     private var grid : Array<Array<GridItem>> = Array(gridSize) { Array(gridSize) { GridItem() } }
     private var isPlayerOneTurn : Boolean = true

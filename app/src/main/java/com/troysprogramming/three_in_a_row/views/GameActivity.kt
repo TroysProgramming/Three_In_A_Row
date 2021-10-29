@@ -129,4 +129,8 @@ class GameActivity : AppCompatActivity() {
     fun stopTheTimer() {
         timer.cancel()
     }
+
+    fun getTime() : String {
+        return "${txtTimerMinutes.text}:${txtTimerSeconds.text}"
+    }
 }

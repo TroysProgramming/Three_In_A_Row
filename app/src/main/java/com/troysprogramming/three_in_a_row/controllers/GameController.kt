@@ -4,12 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.view.View
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
-import android.widget.Toast.LENGTH_SHORT
 import com.troysprogramming.three_in_a_row.R
-import com.troysprogramming.three_in_a_row.models.Game
-import com.troysprogramming.three_in_a_row.models.GridItem
+import com.troysprogramming.three_in_a_row.models.database.SQLiteService
+import com.troysprogramming.three_in_a_row.models.game.Game
+import com.troysprogramming.three_in_a_row.models.game.GridItem
+import com.troysprogramming.three_in_a_row.models.game.HighScore
 import com.troysprogramming.three_in_a_row.views.GameActivity
 
 class GameController(activity: GameActivity)
@@ -20,6 +19,7 @@ class GameController(activity: GameActivity)
 
     private var colour1 : Int = 0
     private var colour2 : Int = 0
+    private var gridSizeStr : String? = null
 
     fun setPlayerColours() {
         colour1 = sharedPref.getInt("colour_1", Color.RED)
@@ -28,7 +28,7 @@ class GameController(activity: GameActivity)
 
     fun generateGrid() {
 
-        val gridSizeStr: String? = sharedPref.getString("grid_size", "4 x 4")
+        gridSizeStr = sharedPref.getString("grid_size", "4 x 4")
         val gridSize: Int = gridSizeStr?.get(0)!!.digitToInt()
 
         // create a new game object and initialise the 2D grid of GridItems
@@ -86,6 +86,16 @@ class GameController(activity: GameActivity)
                     displayMessage(winner, winColour, true)
                     lockGameControls()
                     stopTheTimer()
+
+                    SQLiteService.getInstance().createScore(HighScore(
+                            SQLiteService.getInstance().getHighestID() + 1,
+                            0,
+                            "Guest",
+                            gameActivity.getTime(),
+                            "01/01/2021",
+                            gridSizeStr!!
+                        )
+                    )
                 }
             }
 

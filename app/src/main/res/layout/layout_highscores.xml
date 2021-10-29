@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constr_master"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:backgroundTintMode="src_in">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constr_title"
@@ -58,13 +60,21 @@
                 <include layout="@layout/comp_score_listing" />
 
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
+
                 <include layout="@layout/comp_score_listing" />
             </LinearLayout>
         </ScrollView>

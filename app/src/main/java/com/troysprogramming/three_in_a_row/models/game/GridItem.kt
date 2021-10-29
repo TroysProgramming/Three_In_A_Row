@@ -1,4 +1,4 @@
-package com.troysprogramming.three_in_a_row.models
+package com.troysprogramming.three_in_a_row.models.game
 
 class GridItem {
     companion object {
