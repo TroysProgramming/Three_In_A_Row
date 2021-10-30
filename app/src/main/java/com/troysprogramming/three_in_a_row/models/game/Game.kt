@@ -1,20 +1,16 @@
 package com.troysprogramming.three_in_a_row.models.game
 
-class Game private constructor(gridSize: Int) {
+import androidx.lifecycle.ViewModel
+
+open class Game(gridSize: Int) : ViewModel() {
 
     private var grid : Array<Array<GridItem>> = Array(gridSize) { Array(gridSize) { GridItem() } }
     private var isPlayerOneTurn : Boolean = true
     private var lastItemClicked : GridItem? = null
+    private var minutes : Int = 0
+    private var seconds : Int = 0
 
-    companion object {
-        private var game : Game? = null
-
-        fun startNewGame(gridSize: Int) {
-            game = Game(gridSize)
-        }
-
-        fun getGame() : Game { return game!! }
-    }
+    private var gameEnded = false
 
     fun checkValidMove(x: Int, y: Int) : Boolean {
         return if(isPlayerOneTurn && grid[x][y].getOccupation() == GridItem.Companion.Occupation.PLAYER1)
@@ -75,4 +71,13 @@ class Game private constructor(gridSize: Int) {
         else
             return false
     }
+
+    fun getMinutes() : Int { return minutes }
+    fun setMinutes(minutes: Int) { this.minutes = minutes }
+
+    fun getSeconds() : Int { return seconds }
+    fun setSeconds(seconds: Int) { this.seconds = seconds }
+
+    fun setGameEnded(gameEnded: Boolean) { this.gameEnded = gameEnded }
+    fun isGameEnded() : Boolean { return gameEnded }
 }

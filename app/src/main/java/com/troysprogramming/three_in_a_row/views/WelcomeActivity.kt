@@ -28,7 +28,7 @@ class WelcomeActivity : AppCompatActivity() {
         SQLiteService.createNewInstance(applicationContext)
         highScores = HighScoreFragment()
 
-        if(sis == null) {
+        if (sis == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.frag_highscores, highScores)
@@ -56,6 +56,7 @@ class WelcomeActivity : AppCompatActivity() {
         }
     }
 
+    /*
     override fun onBackPressed() {
         if(!highScores.isHidden) {
             supportFragmentManager.commit {
@@ -65,4 +66,6 @@ class WelcomeActivity : AppCompatActivity() {
         else
             super.onBackPressed()
     }
+
+    */
 }

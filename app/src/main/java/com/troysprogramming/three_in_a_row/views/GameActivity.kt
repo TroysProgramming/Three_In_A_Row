@@ -2,6 +2,7 @@ package com.troysprogramming.three_in_a_row.views
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -26,7 +27,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var btnRestart : Button
     private var seconds : Int = 0
     private var minutes : Int = 0
-    private lateinit var timer : CountDownTimer
+    private var timer : CountDownTimer? = null
 
     override fun onCreate(sis: Bundle?) {
         super.onCreate(sis)
@@ -41,13 +42,16 @@ class GameActivity : AppCompatActivity() {
         currentTurnColour = currentTurnView.findViewById(R.id.view_colour)
         txtMessage = findViewById(R.id.txt_message)
         btnRestart = findViewById(R.id.btn_restart)
-        btnRestart.setOnClickListener { recreate() }
+        btnRestart.setOnClickListener { controller.startNewGame() }
 
         controller.setPlayerColours()
 
         controller.generateGrid()
 
-        fireUpTheTimer()
+        setTime()
+
+        if(!controller.isGameEnded())
+            fireUpTheTimer()
 
         controller.showCurrentTurn(currentTurnColour)
     }
@@ -110,15 +114,19 @@ class GameActivity : AppCompatActivity() {
     private fun fireUpTheTimer() {
         timer = object: CountDownTimer(Long.MAX_VALUE, 1000) {
             override fun onTick(p0: Long) {
-                seconds++
-                if(seconds.mod(60) == 0) {
-                    seconds = 0
-                    minutes++
-                }
+                if(timer != null)
+                {
+                    seconds++
+                    if(seconds.mod(60) == 0) {
+                        seconds = 0
+                        minutes++
+                    }
 
-                runOnUiThread {
-                    txtTimerSeconds.text = if(seconds < 10) "0$seconds" else seconds.toString()
-                    txtTimerMinutes.text = if(minutes < 10) "0$minutes" else minutes.toString()
+                    syncTimeWithGame()
+
+                    runOnUiThread {
+                        showNewTime()
+                    }
                 }
             }
 
@@ -126,11 +134,32 @@ class GameActivity : AppCompatActivity() {
         }.start()
     }
 
+    private fun setTime() {
+        minutes = controller.getMinutes()
+        seconds = controller.getSeconds()
+        showNewTime()
+    }
+
+    private fun syncTimeWithGame() {
+        controller.setMinutes(minutes)
+        controller.setSeconds(seconds)
+    }
+
+    private fun showNewTime() {
+        txtTimerSeconds.text = if(seconds < 10) "0$seconds" else seconds.toString()
+        txtTimerMinutes.text = if(minutes < 10) "0$minutes" else minutes.toString()
+    }
+
     fun stopTheTimer() {
-        timer.cancel()
+        if(timer != null)
+            timer!!.cancel()
     }
 
     fun getTime() : String {
         return "${txtTimerMinutes.text}:${txtTimerSeconds.text}"
+    }
+
+    fun getGridItems() : ArrayList<ArrayList<View>> {
+        return gridItems
     }
 }
