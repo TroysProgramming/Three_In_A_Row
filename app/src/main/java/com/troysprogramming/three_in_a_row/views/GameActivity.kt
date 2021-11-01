@@ -25,9 +25,6 @@ class GameActivity : AppCompatActivity() {
     private lateinit var txtTimerSeconds : TextView
     private lateinit var txtTimerMinutes : TextView
     private lateinit var btnRestart : Button
-    private var seconds : Int = 0
-    private var minutes : Int = 0
-    private var timer : CountDownTimer? = null
 
     override fun onCreate(sis: Bundle?) {
         super.onCreate(sis)
@@ -48,12 +45,17 @@ class GameActivity : AppCompatActivity() {
 
         controller.generateGrid()
 
-        setTime()
+        controller.getTime()
 
         if(!controller.isGameEnded())
-            fireUpTheTimer()
+            controller.fireUpTheTimer()
 
         controller.showCurrentTurn(currentTurnColour)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        controller.stopTheTimer()
     }
 
     fun renderGrid(gridSize: Int) {
@@ -98,61 +100,20 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    fun displayMessage(message: String, color: Int, permanent: Boolean) {
+    fun displayMessage(message: String, color: Int) {
 
         txtMessage.text = message
 
         txtMessage.setTextColor(color)
+    }
 
-        if(!permanent) {
-            Timer().schedule(object: TimerTask() {
-                override fun run() { runOnUiThread { txtMessage.text = "" } }
-            }, 4000)
+    fun clearMessage() { runOnUiThread { txtMessage.text = "" } }
+
+    fun showNewTime(seconds: Int, minutes: Int) {
+        runOnUiThread {
+            txtTimerSeconds.text = if(seconds < 10) "0$seconds" else seconds.toString()
+            txtTimerMinutes.text = if(minutes < 10) "0$minutes" else minutes.toString()
         }
-    }
-
-    private fun fireUpTheTimer() {
-        timer = object: CountDownTimer(Long.MAX_VALUE, 1000) {
-            override fun onTick(p0: Long) {
-                if(timer != null)
-                {
-                    seconds++
-                    if(seconds.mod(60) == 0) {
-                        seconds = 0
-                        minutes++
-                    }
-
-                    syncTimeWithGame()
-
-                    runOnUiThread {
-                        showNewTime()
-                    }
-                }
-            }
-
-            override fun onFinish() { }
-        }.start()
-    }
-
-    private fun setTime() {
-        minutes = controller.getMinutes()
-        seconds = controller.getSeconds()
-        showNewTime()
-    }
-
-    private fun syncTimeWithGame() {
-        controller.setMinutes(minutes)
-        controller.setSeconds(seconds)
-    }
-
-    private fun showNewTime() {
-        txtTimerSeconds.text = if(seconds < 10) "0$seconds" else seconds.toString()
-        txtTimerMinutes.text = if(minutes < 10) "0$minutes" else minutes.toString()
-    }
-
-    fun stopTheTimer() {
-        if(timer != null)
-            timer!!.cancel()
     }
 
     fun getTime() : String {

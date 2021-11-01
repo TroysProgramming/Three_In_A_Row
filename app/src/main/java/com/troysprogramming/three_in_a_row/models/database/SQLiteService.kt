@@ -1,6 +1,7 @@
 package com.troysprogramming.three_in_a_row.models.database
 
 import android.content.Context
+import com.troysprogramming.three_in_a_row.models.User
 import com.troysprogramming.three_in_a_row.models.game.HighScore
 
 class SQLiteService private constructor(context: Context) {
@@ -31,7 +32,13 @@ class SQLiteService private constructor(context: Context) {
         db.scoreDao().createScores(highScore)
     }
 
-    fun getHighestID() : Int {
-        return db.scoreDao().getHighestId()
+    fun getHighestScoreID() : Int { return db.scoreDao().getHighestId() }
+
+    fun createUser(user: User) { db.userDao().createUser(user) }
+
+    fun getUsersUnderUsernameResult(userName: String) : List<User> {
+        return db.userDao().getUsersUnderUsernameResult(userName)
     }
+
+    fun getHighestUserID() : Int { return db.userDao().getHighestId() }
 }

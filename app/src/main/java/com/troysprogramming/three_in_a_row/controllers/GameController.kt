@@ -3,16 +3,19 @@ package com.troysprogramming.three_in_a_row.controllers
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.os.CountDownTimer
 import android.view.View
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.troysprogramming.three_in_a_row.R
+import com.troysprogramming.three_in_a_row.models.User
 import com.troysprogramming.three_in_a_row.models.database.SQLiteService
 import com.troysprogramming.three_in_a_row.models.game.Game
 import com.troysprogramming.three_in_a_row.models.game.GameVMFactory
 import com.troysprogramming.three_in_a_row.models.game.GridItem
 import com.troysprogramming.three_in_a_row.models.game.HighScore
 import com.troysprogramming.three_in_a_row.views.GameActivity
+import java.util.*
+import kotlin.collections.ArrayList
 
 class GameController(activity: GameActivity)
 {
@@ -20,6 +23,7 @@ class GameController(activity: GameActivity)
     private val sharedPref : SharedPreferences =
         gameActivity.getSharedPreferences("3inarow_settings.xml", Context.MODE_PRIVATE)
     private lateinit var game : Game
+    private var timer : CountDownTimer? = null
 
     private var colour1 : Int = 0
     private var colour2 : Int = 0
@@ -53,6 +57,34 @@ class GameController(activity: GameActivity)
             endGame()
     }
 
+    fun fireUpTheTimer() {
+        timer = object: CountDownTimer(Long.MAX_VALUE, 1000) {
+            override fun onTick(p0: Long) {
+                if(timer != null)
+                {
+                    game.setSeconds(game.getSeconds() + 1)
+                    if(game.getSeconds().mod(60) == 0) {
+                        game.setSeconds(0)
+                        game.setMinutes(game.getMinutes() + 1)
+                    }
+
+                    gameActivity.showNewTime(game.getSeconds(), game.getMinutes())
+                }
+            }
+
+            override fun onFinish() { }
+        }.start()
+    }
+
+    fun getTime() {
+        gameActivity.showNewTime(game.getSeconds(), game.getMinutes())
+    }
+
+    fun stopTheTimer() {
+        if(timer != null)
+            timer!!.cancel()
+    }
+
     fun onGridItemClick(clickedView: View, x: Int, y: Int, currentTurnView: View) {
         // notify the Game instance that a grid item in the passed co-ordinates has been touched
         val isValidMove : Boolean = game.checkValidMove(x, y)
@@ -78,14 +110,15 @@ class GameController(activity: GameActivity)
             // if the game is over, show the winner
             if(isGameOver)
             {
-                SQLiteService.getInstance().createScore(HighScore(
-                    SQLiteService.getInstance().getHighestID() + 1,
-                    0,
-                    "Guest",
-                    gameActivity.getTime(),
-                    "01/01/2021",
-                    gridSizeStr!!
-                )
+                SQLiteService.getInstance().createScore(
+                    HighScore(
+                        SQLiteService.getInstance().getHighestScoreID() + 1,
+                        User.getUser().getID(),
+                        User.getUser().getUsername(),
+                        gameActivity.getTime(),
+                        "01/01/2021",
+                        gridSizeStr!!
+                    )
                 )
 
                 endGame()
@@ -97,9 +130,17 @@ class GameController(activity: GameActivity)
         else
         {
             // if the move is not valid, present an error to the user.
-            gameActivity.displayMessage(gameActivity.baseContext.resources
-                .getString(R.string.invalidmove), Color.RED, false)
+            handleInvalidMove()
         }
+    }
+
+    private fun handleInvalidMove() {
+        gameActivity.displayMessage(gameActivity.baseContext.resources
+            .getString(R.string.invalidmove), Color.RED)
+
+        Timer().schedule(object: TimerTask() {
+            override fun run() { gameActivity.clearMessage() }
+        }, 4000)
     }
 
     fun findIDIn2DArray(tag: Int, arr: ArrayList<ArrayList<View>>) : Array<Int> {
@@ -143,10 +184,15 @@ class GameController(activity: GameActivity)
         }
 
         with(gameActivity) {
-            displayMessage(winner, winColour, true)
+            showWinner(winner, winColour)
             lockGameControls()
             stopTheTimer()
         }
+    }
+
+    private fun showWinner(winner: String, winColour: Int) {
+        gameActivity.displayMessage(winner, winColour)
+
 
     }
 

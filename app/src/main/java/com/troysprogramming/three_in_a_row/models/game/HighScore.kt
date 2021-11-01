@@ -2,7 +2,9 @@ package com.troysprogramming.three_in_a_row.models.game;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey;
+import com.troysprogramming.three_in_a_row.models.User
 
 @Entity(tableName = "score")
 class HighScore(id: Int, userId: Int, userName: String, time: String, date: String, gridSize: String) {

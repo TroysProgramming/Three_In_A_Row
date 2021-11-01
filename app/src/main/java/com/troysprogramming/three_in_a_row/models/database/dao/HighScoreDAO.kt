@@ -1,4 +1,4 @@
-package com.troysprogramming.three_in_a_row.models.database
+package com.troysprogramming.three_in_a_row.models.database.dao
 
 import androidx.room.*
 import com.troysprogramming.three_in_a_row.models.game.HighScore
