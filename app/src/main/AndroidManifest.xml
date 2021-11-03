@@ -9,7 +9,7 @@
         android:label="Three In A Row"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" >
+        android:theme="@style/Theme.Three_In_A_Row" >
         <activity
             android:name=".views.WelcomeActivity"
             android:exported="true" >
@@ -40,7 +40,15 @@
             android:name=".views.UserLoginSignupActivity"
             android:exported="false" >
             <intent-filter>
-                <action android:name="com.troysprogramming.three_in_a_row.views.HighScoreActivity" />
+                <action android:name="com.troysprogramming.three_in_a_row.views.UserLoginSignupActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".views.FragmentActivity"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.troysprogramming.three_in_a_row.views.FragmentActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

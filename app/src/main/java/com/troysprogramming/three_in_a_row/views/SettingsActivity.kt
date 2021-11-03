@@ -38,7 +38,6 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var sharedPref : SharedPreferences
 
-    // TODO: For colour picker: https://github.com/yukuku/ambilwarna
     override fun onCreate(sis: Bundle?) {
         super.onCreate(sis)
         setContentView(R.layout.layout_settings)

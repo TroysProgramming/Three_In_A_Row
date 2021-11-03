@@ -23,23 +23,14 @@ class WelcomeActivity : AppCompatActivity() {
     private lateinit var txtLogin : TextView
 
     private lateinit var constrButtons : ConstraintLayout
-    private lateinit var highScores : Fragment
+
+    private var loggedIn : Boolean = false
 
     override fun onCreate(sis: Bundle?) {
         super.onCreate(sis)
         setContentView(R.layout.layout_welcome)
 
         SQLiteService.createNewInstance(applicationContext)
-        User.logout()
-        highScores = HighScoreFragment()
-
-        if (sis == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add(R.id.frag_highscores, highScores)
-                hide(highScores)
-            }
-        }
 
         constrButtons = findViewById(R.id.constr_master)
 
@@ -57,30 +48,31 @@ class WelcomeActivity : AppCompatActivity() {
         }
 
         btnHighScores.setOnClickListener {
-            supportFragmentManager.commit {
-                show(highScores)
-            }
+            startActivity(Intent(this, FragmentActivity::class.java))
         }
 
-        btnLogin.setOnClickListener {
-            startActivity(Intent(this, UserLoginSignupActivity::class.java))
-        }
+        btnLogin.setOnClickListener { btnLogin() }
     }
 
     override fun onStart() {
         super.onStart()
 
         if(User.getUser().getID() != 0)
+        {
+            loggedIn = true
             txtLogin.text = "Logged in as: ${User.getUser().getUsername()}"
+            btnLogin.text = resources.getText(R.string.logout)
+        }
     }
 
-    override fun onBackPressed() {
-        if(!highScores.isHidden) {
-            supportFragmentManager.commit {
-                hide(highScores)
-            }
+    private fun btnLogin() : Unit {
+        if(loggedIn) {
+            User.logout()
+            loggedIn = false
+            recreate()
         }
-        else
-            super.onBackPressed()
+        else {
+            startActivity(Intent(this, UserLoginSignupActivity::class.java))
+        }
     }
 }

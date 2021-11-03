@@ -20,9 +20,8 @@
     <string name="new_account">Don\'t have an account? Sign up</string>
     <string name="signup">Sign Up</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="submit">Submit</string>
-
-    <!-- TODO: Drop down menu, follow: https://www.geeksforgeeks.org/exposed-drop-down-menu-in-android/ -->
 
     <string-array name="grid_sizes">
         <item>4 x 4</item>
