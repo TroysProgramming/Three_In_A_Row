@@ -20,4 +20,11 @@ class FragmentActivity : AppCompatActivity() {
             add(R.id.frag_master, highScores)
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        supportFragmentManager.commit {
+            remove(highScores)
+        }
+    }
 }

@@ -60,12 +60,13 @@ class WelcomeActivity : AppCompatActivity() {
         if(User.getUser().getID() != 0)
         {
             loggedIn = true
-            txtLogin.text = "Logged in as: ${User.getUser().getUsername()}"
+            txtLogin.text = String.format(resources.getText(R.string.loggedinas) as String,
+                User.getUser().getUsername())
             btnLogin.text = resources.getText(R.string.logout)
         }
     }
 
-    private fun btnLogin() : Unit {
+    private fun btnLogin() {
         if(loggedIn) {
             User.logout()
             loggedIn = false

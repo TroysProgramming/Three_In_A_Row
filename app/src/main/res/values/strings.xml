@@ -20,6 +20,7 @@
     <string name="new_account">Don\'t have an account? Sign up</string>
     <string name="signup">Sign Up</string>
     <string name="login">Login</string>
+    <string name="loggedinas">Logged in as: %1$s</string>
     <string name="logout">Logout</string>
     <string name="submit">Submit</string>
 

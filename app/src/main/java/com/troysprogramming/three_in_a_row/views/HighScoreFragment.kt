@@ -1,46 +1,56 @@
 package com.troysprogramming.three_in_a_row.views
 
-import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.troysprogramming.three_in_a_row.R
 import com.troysprogramming.three_in_a_row.models.database.SQLiteService
+import com.troysprogramming.three_in_a_row.models.game.GameVMFactory
 import com.troysprogramming.three_in_a_row.models.game.HighScore
+import com.troysprogramming.three_in_a_row.viewmodels.GameViewModel
+import com.troysprogramming.three_in_a_row.viewmodels.HighScoreViewModel
 
 class HighScoreFragment : Fragment(R.layout.layout_highscores) {
 
     private lateinit var llvScores : LinearLayout
-    private lateinit var scores : ArrayList<HighScore>
+    private lateinit var highScoreVM: HighScoreViewModel
 
     override fun onStart() {
         super.onStart()
 
-        llvScores = requireView().findViewById(R.id.llv_scores)
-        scores = SQLiteService.getInstance().getTopTenScores()
+        highScoreVM = ViewModelProvider(this).get(HighScoreViewModel::class.java)
 
-        for(i in 0 until llvScores.childCount) {
-            var constrScore : ConstraintLayout = llvScores.getChildAt(i) as ConstraintLayout
-            var txtPosition : TextView = constrScore.findViewById(R.id.txt_position)
-            var txtTime : TextView = constrScore.findViewById(R.id.txt_time)
-            var txtGrid : TextView = constrScore.findViewById(R.id.txt_grid)
-            var txtDate : TextView = constrScore.findViewById(R.id.txt_date)
-            var txtUser : TextView = constrScore.findViewById(R.id.txt_user)
+        llvScores = requireView().findViewById(R.id.llv_scores)
+
+        for (i in 0 until llvScores.childCount) {
+
+            val constrScore : ConstraintLayout = llvScores.getChildAt(i) as ConstraintLayout
+            val txtPosition : TextView = constrScore.findViewById(R.id.txt_position)
+            val txtTime : TextView = constrScore.findViewById(R.id.txt_time)
+            val txtGrid : TextView = constrScore.findViewById(R.id.txt_grid)
+            val txtDate : TextView = constrScore.findViewById(R.id.txt_date)
+            val txtUser : TextView = constrScore.findViewById(R.id.txt_user)
 
             txtPosition.text = (i + 1).toString()
 
-            if(scores.size <= i) {
+            if(i < highScoreVM.getScoreListLength())
+            {
+                highScoreVM.getScores(i).observe(this) { score ->
+
+                    txtTime.text = score.getTime()
+                    txtGrid.text = score.getGridSize()
+                    txtDate.text = score.getDate()
+                    txtUser.text = score.getUserName()
+                }
+            }
+            else
+            {
                 txtTime.text = ""
                 txtGrid.text = ""
                 txtDate.text = ""
                 txtUser.text = ""
-            }
-            else {
-                txtTime.text = scores[i].getTime()
-                txtGrid.text = scores[i].getGridSize()
-                txtDate.text = scores[i].getDate()
-                txtUser.text = scores[i].getUserName()
             }
         }
     }
