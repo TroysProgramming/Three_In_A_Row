@@ -1,7 +1,6 @@
 package com.troysprogramming.three_in_a_row.models.internetservice
 
 import com.troysprogramming.three_in_a_row.models.game.ServerScore
-import kotlin.reflect.KClass
 
 class GameServer : RetrofitService("http://10.0.0.9:5000/api/", ServerScore::class) {
 

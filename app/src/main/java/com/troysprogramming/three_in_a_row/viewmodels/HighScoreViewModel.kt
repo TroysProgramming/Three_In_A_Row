@@ -7,16 +7,29 @@ import com.troysprogramming.three_in_a_row.models.game.HighScore
 
 class HighScoreViewModel : ViewModel() {
 
-    private var scoreList : ArrayList<HighScore> = SQLiteService.getInstance().getTopTenScores()
-    private var scores: ArrayList<MutableLiveData<HighScore>> = ArrayList()
+    private var scoreList : MutableLiveData<ArrayList<HighScore>> =
+        MutableLiveData<ArrayList<HighScore>>()
+    private var isUserScores: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
     init {
-        for(i in 0 until scoreList.size) {
-            scores.add(MutableLiveData<HighScore>())
-            scores[i].value = scoreList[i]
-        }
+        isUserScores.value = false
+        scoreList.value = SQLiteService.getInstance().getTopTenScores()
+        displayScores()
     }
 
-    fun getScores(i: Int): MutableLiveData<HighScore> { return scores[i] }
-    fun getScoreListLength(): Int { return scores.size }
+    fun getIsUserScores(): MutableLiveData<Boolean> { return isUserScores }
+    fun getScores(): MutableLiveData<ArrayList<HighScore>> { return scoreList }
+    fun getScoreListLength(): Int { return scoreList.value!!.size }
+
+    fun swapScores() {
+        isUserScores.value = !isUserScores.value!!
+        displayScores()
+    }
+
+    private fun displayScores() {
+        scoreList.value = if(isUserScores.value!!)
+            SQLiteService.getInstance().getUsersTopTenScores()
+        else
+            SQLiteService.getInstance().getTopTenScores()
+    }
 }

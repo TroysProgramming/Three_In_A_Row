@@ -5,15 +5,20 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.ViewModelProvider
 import com.troysprogramming.three_in_a_row.R
+import com.troysprogramming.three_in_a_row.viewmodels.SettingsViewModel
+import com.troysprogramming.three_in_a_row.viewmodels.vmfactory.SettingsVMFactory
 import yuku.ambilwarna.AmbilWarnaDialog
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity(), OnItemSelectedListener {
 
     private lateinit var btnColour1 : ConstraintLayout
     private lateinit var displayColour1 : View
@@ -22,43 +27,44 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var displayColour2 : View
 
     private lateinit var colorPicker : AmbilWarnaDialog
-    private var colour1 : Int = 0
-    private var colour2 : Int = 0
 
-    private lateinit var gridSizeList : Array<String>
     private lateinit var dropDownAdapter : ArrayAdapter<String>
-    private lateinit var gridSizeText : AutoCompleteTextView
-
-    private val defaultColour1 = Color.RED
-    private val defaultColour2 = Color.BLUE
-    private lateinit var defaultGridSize : String
+    private lateinit var gridSizeText : Spinner
 
     private lateinit var btnReset : Button
     private lateinit var btnSave : Button
 
     private lateinit var sharedPref : SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
+
+    private lateinit var settingsVM: SettingsViewModel
+
+    private var col: Int = 0
 
     override fun onCreate(sis: Bundle?) {
+
+        sharedPref = this.getSharedPreferences("3inarow_settings.xml", Context.MODE_PRIVATE)
+        editor = sharedPref.edit()
+
         super.onCreate(sis)
         setContentView(R.layout.layout_settings)
 
-        sharedPref = this.getSharedPreferences("3inarow_settings.xml", Context.MODE_PRIVATE)
+        initVM()
 
         displayColour1 = findViewById(R.id.view_colour1)
         btnColour1 = findViewById(R.id.constr_colour1)
         btnColour1.setOnClickListener {
-            colorPicker = AmbilWarnaDialog(this, colour1,
+            col = settingsVM.getColour1().value!!
+            colorPicker = AmbilWarnaDialog(this, col,
                 object: AmbilWarnaDialog.OnAmbilWarnaListener
                 {
                     override fun onOk(dialog: AmbilWarnaDialog?, color: Int) {
-                        colour1 = color
-                        displayColour1.setBackgroundColor(color)
+                        col = color
+                        settingsVM.applyColour1(col)
                     }
 
-                    override fun onCancel(dialog: AmbilWarnaDialog?) {
-
-                    }
-            })
+                    override fun onCancel(dialog: AmbilWarnaDialog?) { }
+                })
 
             colorPicker.show()
         }
@@ -66,25 +72,20 @@ class SettingsActivity : AppCompatActivity() {
         displayColour2 = findViewById(R.id.view_colour2)
         btnColour2 = findViewById(R.id.constr_colour2)
         btnColour2.setOnClickListener {
-            colorPicker = AmbilWarnaDialog(this, colour2,
+            col = settingsVM.getColour2().value!!
+            colorPicker = AmbilWarnaDialog(this, col,
                 object: AmbilWarnaDialog.OnAmbilWarnaListener
                 {
                     override fun onOk(dialog: AmbilWarnaDialog?, color: Int) {
-                        colour2 = color
-                        displayColour2.setBackgroundColor(color)
+                        col = color
+                        settingsVM.applyColour2(col)
                     }
 
-                    override fun onCancel(dialog: AmbilWarnaDialog?) {
-
-                    }
+                    override fun onCancel(dialog: AmbilWarnaDialog?) { }
             })
 
             colorPicker.show()
         }
-
-        gridSizeList = resources.getStringArray(R.array.grid_sizes)
-        defaultGridSize = gridSizeList[0]
-        reloadDropDownAdapter()
 
         btnReset = findViewById(R.id.btn_reset)
         btnReset.setOnClickListener { resetToDefault() }
@@ -92,50 +93,58 @@ class SettingsActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.btn_save)
         btnSave.setOnClickListener { saveSettings() }
 
-        loadSettings()
-    }
-
-    private fun saveSettings() {
-        var editor : SharedPreferences.Editor = sharedPref.edit()
-
-        editor.putInt("colour_1", colour1)
-        editor.putInt("colour_2", colour2)
-        editor.putString("grid_size", gridSizeText.text.toString())
-
-        editor.apply()
-
-        finish()
-    }
-
-    private fun loadSettings() {
-
-        colour1 = sharedPref.getInt("colour_1", Color.RED)
-        colour2 = sharedPref.getInt("colour_2", Color.BLUE)
-        gridSizeText.setText(sharedPref.getString("grid_size", "4 x 4"))
         reloadDropDownAdapter()
-        refreshColours()
+        observeSettings()
     }
+
+    private fun saveSettings() { finish() }
 
     private fun resetToDefault() {
-        var editor : SharedPreferences.Editor = sharedPref.edit()
         editor.clear()
         editor.apply()
-
-        colour1 = defaultColour1
-        colour2 = defaultColour2
-        gridSizeText.setText(defaultGridSize)
-        reloadDropDownAdapter()
-        refreshColours()
+        viewModelStore.clear()
+        recreate()
     }
 
     private fun reloadDropDownAdapter() {
-        dropDownAdapter = ArrayAdapter(this, R.layout.comp_gridsize_dropdown, gridSizeList)
-        gridSizeText = findViewById(R.id.actxt_gridsize)
-        gridSizeText.setAdapter(dropDownAdapter)
+        dropDownAdapter = ArrayAdapter(
+            this,
+            R.layout.comp_gridsize_dropdown,
+            settingsVM.getGridSizeList()
+        )
+        gridSizeText = findViewById(R.id.spn_gridsize)
+        gridSizeText.adapter = dropDownAdapter
+        gridSizeText.setSelection(settingsVM.getGridSizeList()
+            .indexOf(settingsVM.getGridSize().value))
+        gridSizeText.onItemSelectedListener = this
     }
 
-    private fun refreshColours() {
-        displayColour1.setBackgroundColor(colour1)
-        displayColour2.setBackgroundColor(colour2)
+    private fun initVM() {
+        settingsVM = ViewModelProvider(this, SettingsVMFactory(
+            sharedPref.getInt("colour_1", Color.RED),
+            sharedPref.getInt("colour_2", Color.BLUE),
+            sharedPref.getString("grid_size", "4 x 4")!!,
+            resources.getStringArray(R.array.grid_sizes)
+        )).get(SettingsViewModel::class.java)
     }
+
+    private fun observeSettings() {
+        settingsVM.getColour1().observe(this, { col1 ->
+            displayColour1.setBackgroundColor(col1)
+            editor.putInt("colour_1", col1).apply()
+        })
+        settingsVM.getColour2().observe(this, { col2 ->
+            displayColour2.setBackgroundColor(col2)
+            editor.putInt("colour_2", col2).apply()
+        })
+        settingsVM.getGridSize().observe(this, { gridSize ->
+            editor.putString("grid_size", gridSize).apply()
+        })
+    }
+
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+        settingsVM.onGridSizeSelected(p0!!.getItemAtPosition(p2) as String)
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) { }
 }

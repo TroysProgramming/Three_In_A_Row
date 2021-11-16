@@ -1,6 +1,5 @@
-package com.troysprogramming.three_in_a_row.models.game
+package com.troysprogramming.three_in_a_row.viewmodels.vmfactory
 
-import android.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.troysprogramming.three_in_a_row.viewmodels.GameViewModel

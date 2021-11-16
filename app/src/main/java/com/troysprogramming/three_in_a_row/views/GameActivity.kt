@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import com.troysprogramming.three_in_a_row.R
-import com.troysprogramming.three_in_a_row.models.game.GameVMFactory
+import com.troysprogramming.three_in_a_row.viewmodels.vmfactory.GameVMFactory
 import com.troysprogramming.three_in_a_row.models.game.GridItem
 import com.troysprogramming.three_in_a_row.viewmodels.GameViewModel
 import kotlin.collections.ArrayList

@@ -15,7 +15,7 @@ class SQLiteService private constructor(context: Context) {
 
         private lateinit var db : ThreeInARowDb
 
-        fun createNewInstance(context: Context) : Unit {
+        fun createNewInstance(context: Context) {
             sqliteService = SQLiteService(context)
         }
 
@@ -28,8 +28,20 @@ class SQLiteService private constructor(context: Context) {
         return db.scoreDao().getTopTenScores() as ArrayList<HighScore>
     }
 
-    fun createScore(highScore : HighScore) : Unit {
+    fun getUsersTopTenScores(): ArrayList<HighScore> {
+        return db.scoreDao().getUsersTopTenScores(User.getUser().getID()) as ArrayList<HighScore>
+    }
+
+    fun createScore(highScore : HighScore) {
         db.scoreDao().createScores(highScore)
+
+        var scores = db.scoreDao().getUsersTopTenScores(User.getUser().getID()) as ArrayList<HighScore>
+
+        if(scores.size > 10) {
+            for(i in 10 until scores.size) {
+                db.scoreDao().deleteScore(scores[i])
+            }
+        }
     }
 
     fun getHighestScoreID() : Int { return db.scoreDao().getHighestId() }
